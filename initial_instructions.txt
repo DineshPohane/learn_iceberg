@@ -1,47 +1,79 @@
-Step-1:
+README.txt
+This is a simple text file that contains the README for the project.
+I am going to document the setup process for the project.
+
+
+1. setup cursor to work with codespaces. You must know your email address and know your GitHub password.
+    prerequisites:
+        A GitHub Codespace already created
+        GitHub CLI installed (gh)
+        Cursor installed (https://cursor.sh)
+        SSH working on your machine
+    Create an SSH key.
+        ssh-keygen -t ed25519 -C "your_email@example.com"  # C:\Users\dines/.ssh/id_ed25519
+        cat C:\Users\dines\.ssh\id_ed25519.pub
+    Add the SSH key to GitHub
+        Go to GitHub.com → Settings → SSH and GPG keys
+        Click "New SSH key"
+        Give it a descriptive title (e.g., "Cursor IDE")
+        Paste your public key
+        Click "Add SSH key" . Github will prompt you to enter your password.
+
+    Test the connection
+        ssh -T git@github.com
+    gh auth login
+    gh auth refresh -h github.com -s codespace # Give authorization to access the codespace.
+    gh codespace list # List all codespaces.
+    gh codespace ssh --config my-codespace-name # Connect to the codespace.
+    
+
+# 🧊 PySpark and Apache Iceberg Local Development Setup
+
+This guide provides the steps to set up a local development environment using **Poetry** for package management, **PySpark** for big data processing, and **Apache Iceberg** as the high-performance table format.
+
+The setup leverages a local **Hadoop-based SparkCatalog** for Iceberg development.
+
+## 📋 Prerequisites
+
+Ensure you have the following installed on your system (Windows or macOS/Linux):
+
+* **Python 3.x**
+* **Java Runtime Environment (JRE)** (Required for Spark and Iceberg)
+* **pip** (Python package installer)
+
+---
+
+## 🚀 Setup Instructions
+
+### Step 1: Install Poetry
+
+**Poetry** is used to manage dependencies and create isolated project environments.
+
+```bash
 pip install poetry
-Step-2:
-Create a new directory for your project
+
+
+# Create a new directory for your project
 mkdir iceberg_pyspark_project
 cd iceberg_pyspark_project
-Initialize a new Poetry project
-cd iceberg_pyspark_project
+
+# Initialize a new Poetry project (follow the prompts, you can accept defaults)
 poetry init
-Step-3:
-Create a virtual environment.
+
+# Create a virtual environment within the directory
 python -m venv .venv
-source .venv/bin/activate
-Step-4:
-Add PySpark as a development dependency
+Platform,Command to Activate
+macOS/Linux,source .venv/bin/activate
+Windows (Git Bash),source .venv/Scripts/activate
+Windows (CMD/PowerShell),.venv\Scripts\activate
+
 poetry add --group=dev pyspark ipykernel
-Step-5: Setpu jupyter
-Below command,
-from pyspark.sql import SparkSession
 
-Initialize Spark session with Iceberg configurations
-spark = SparkSession.builder
-.appName("IcebergLocalDevelopment")
-.config('spark.jars.packages', 'org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2')
-.config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
-.config("spark.sql.catalog.local", "org.apache.iceberg.spark.SparkCatalog")
-.config("spark.sql.catalog.local.type", "hadoop")
-.config("spark.sql.catalog.local.warehouse", "spark-warehouse/iceberg")
-.getOrCreate()
+# Install Jupyter (if not already installed globally)
+pip install jupyter
 
-Verify Spark session creation
-spark.sql("SHOW DATABASES").show()
+# Install the current environment as a Jupyter kernel
+python -m ipykernel install --user --name=iceberg_env --display-name "Iceberg PySpark Dev"
 
-Create an Iceberg table
-spark.sql(""" CREATE TABLE local.schema.users ( id INT, name STRING, age INT ) USING iceberg""")
-
-Insert some sample data
-spark.sql(""" INSERT INTO local.schema.users VALUES (1, 'Alice', 30), (2, 'Bob', 25), (3, 'Charlie', 35)""")
-
-Query the data
-result = spark.sql("SELECT * FROM local.schema.users") result.show()
-
-Step-6: change interpreter
-Get python interpreter path,
-poetry env info
-/workspaces/ICEBERG/iceberg_pyspark_project/.venv
-Change jupyter notebook kernal
+# Start the Jupyter Notebook server
+jupyter notebook
